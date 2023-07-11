@@ -27,10 +27,13 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
         lastLine = len(splits)
 
         mcs = extract.extract_mc_questions(question)
-        if (len(mcs) == 0):
+        splits_by_question_start = re.split(extract.mc_regex, question)
+        prompt = splits_by_question_start[0].strip()
+
+    
+        if len(mcs) == 0 and re.match(r"^[0-9]{0,3}\.\s?Frage:?\s*\n|$", prompt) != None:
             continue
 
-        
         firstQuestionIndex = -1
         for j, split in enumerate(splits):
             match = re.match(extract.mc_regex, split)
@@ -44,7 +47,7 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
                 answerSplits = split.split("Antwort:")
                 if (len(answerSplits) <= 1):
                     continue
-            
+                
                 splits[j] = "Antwort:" + answerSplits[1]
                 continue
             if "Kommentar:" in split:
@@ -58,7 +61,6 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
         mcs_l = len(mcs)
 
         if use_gpt:
-            prompt = re.split(extract.mc_regex, question)[0]
             gpt_anwsers = generator.generate_anwsers(prompt, 5 - len(mcs), prev_anwsers=mcs)
 
             print(f"GPT Anwsers: {gpt_anwsers}")
@@ -69,6 +71,8 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
                     break
                 if mcs.get(i) is not None:
                     continue
+
+
                 mcs[i] = (gpt_anwsers[usedAnswers], True)
                 usedAnswers += 1
 
@@ -103,6 +107,7 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
     makedirs("output", exist_ok=True)
     filename_parts = filename.split("-")
     gpt_mode = "-gpt" if use_gpt else "-no-gpt"
+    gpt_cat = "-GPT" if use_gpt else ""
 
     if (combined_output):
         output_path = f"output/ankis{gpt_mode}-combined.txt"
@@ -112,12 +117,12 @@ def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt =
             if file.read() == "": 
                 file.write('#deck column:3\n')
             for key, value in question_anwser_dict.items():
-                file.write(f'"{key}";"{value}";"Medizin::2.Lernspirale::Modul {filename_parts[1]}::Altfragen::{filename_parts[0]}"\n')
+                file.write(f'"{key}";"{value}";"Medizin::2.Lernspirale::Modul {filename_parts[1]}::Altfragen{gpt_cat}::{filename_parts[0]}"\n')
     else:
         with open(f"output/ankis{gpt_mode}-{filename.split('.')[0]}.txt", "w") as file:
             file.write('#deck column:3\n')
             for key, value in question_anwser_dict.items():
-                file.write(f'"{key}";"{value}";"Medizin::2.Lernspirale::Modul {filename_parts[1]}::Altfragen::{filename_parts[0]}"\n')
+                file.write(f'"{key}";"{value}";"Medizin::2.Lernspirale::Modul {filename_parts[1]}::Altfragen{gpt_cat}::{filename_parts[0]}"\n')
 
 
 

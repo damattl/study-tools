@@ -1,0 +1,13 @@
+# Study Tools
+
+## Altfragen to Anki
+### Setup
+To use the ChatGPT Feature create <code>config.py</code> File ath the _altfragen-to-anki_ folder and add the following:
+```python
+openai_secret = "YOUR_API_KEY"
+```
+
+You can get your personal API key from here: <br>[OpenAI API Keys](https://platform.openai.com/account/api-keys)
+
+
+Everything else is coming soon!
