@@ -1,5 +1,3 @@
-bin/
-obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
+altfragen
+output
+.DS_Store
