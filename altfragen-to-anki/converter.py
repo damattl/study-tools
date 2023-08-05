@@ -14,6 +14,7 @@ def get_correct_output_path(filename: str, output_dir: str, combined_output: boo
 
     return f"{output_dir}/ankis{gpt_mode}-{filename.split('.')[0]}.txt"
 
+
 def fill_anki_txt_file(altfragen: list[Altfrage], filename: str, output_dir, combined_output: bool, use_gpt: bool):
     makedirs(output_dir, exist_ok=True)
     output_path = get_correct_output_path(filename, output_dir, combined_output, use_gpt)
@@ -32,8 +33,14 @@ def fill_anki_txt_file(altfragen: list[Altfrage], filename: str, output_dir, com
             file.write("\n")
             
 
-def convert_file_to_anki(filename: str, combined_output: bool = False, use_gpt = False, output_dir = "output", input_dir="./altfragen/"):
-    if (path.splitext(filename)[1] != ".txt"):
+def convert_file_to_anki(
+        filename: str,
+        combined_output: bool = False,
+        use_gpt=False,
+        output_dir="output",
+        input_dir="./altfragen/"
+):
+    if path.splitext(filename)[1] != ".txt":
         return
     
     with open(f'{input_dir}{filename}') as f:
